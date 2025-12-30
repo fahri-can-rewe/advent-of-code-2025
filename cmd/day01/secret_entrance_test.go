@@ -120,3 +120,49 @@ func TestMoveDialP1(t *testing.T) {
 		})
 	}
 }
+
+func TestCountDialPointsAndPassedZero(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []Rotator
+		want  int
+	}{
+		{
+			name: "multiple instructions",
+			input: []Rotator{
+				{"L", 68},
+				{"L", 30},
+				{"R", 48},
+				{"L", 5},
+				{"R", 60},
+				{"L", 55},
+				{"L", 1},
+				{"L", 99},
+				{"R", 14},
+				{"L", 82},
+			},
+			want: 6,
+		},
+		{
+			name:  "zero instructions",
+			input: []Rotator{},
+			want:  0,
+		},
+		{
+			name: "single instruction",
+			input: []Rotator{
+				{"R", 1000},
+			},
+			want: 10,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := countDialPointsAndPassedZero(test.input)
+			if got != test.want {
+				t.Errorf("%s: countDialPointsAndPassedZero() = %d; want %d", test.name, got, test.want)
+			}
+		})
+	}
+}
