@@ -32,7 +32,7 @@ func generateInstructions(input string) []Rotator {
 	return instructions
 }
 
-func moveDialP1(rotations []Rotator) int {
+func countDialPointsZero(rotations []Rotator) int {
 	dialPos := 50
 	counter := 0
 	for _, rotator := range rotations {
@@ -59,7 +59,7 @@ func moveDialP1(rotations []Rotator) int {
 	return counter
 }
 
-func moveDialP2(rotations []Rotator) int {
+func countDialPointsAndPassedZero(rotations []Rotator) int {
 	dialPos := 50
 	counter := 0
 
