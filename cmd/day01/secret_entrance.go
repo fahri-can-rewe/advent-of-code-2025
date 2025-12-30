@@ -62,42 +62,31 @@ func countDialPointsZero(rotations []Rotator) int {
 func countDialPointsAndPassedZero(rotations []Rotator) int {
 	dialPos := 50
 	counter := 0
-
 	for _, rotator := range rotations {
-		if rotator.steps <= 0 {
-			continue
-		}
-
-		var distToZero int
 		if rotator.direction == "R" {
-			// If at 0, the next 0 is 100 clicks away. Otherwise, it's 100 - pos.
-			if dialPos == 0 {
-				distToZero = allDialPositions
-			} else {
-				distToZero = allDialPositions - dialPos
-			}
-
-			// New position after rotation
+			counter += (dialPos + rotator.steps) / allDialPositions
 			dialPos = (dialPos + rotator.steps) % allDialPositions
 		} else {
-			// Moving Left, the distance to zero is simply the current position.
-			// If at 0, the next 0 is 100 clicks away.
+			// If we start at 0, we only hit 0 again after a full 100 steps
+			startPos := dialPos
 			if dialPos == 0 {
-				distToZero = allDialPositions
-			} else {
-				distToZero = dialPos
+				startPos = allDialPositions
+			}
+			// Check if we move far enough to reach or pass the '0' mark.
+			// Note: if we start at 0, 'startPos' is 100, meaning we only hit
+			// zero again if we complete a full rotation.
+			if rotator.steps >= startPos {
+				// We count 1 for the first time we hit/pass zero,
+				// then add 1 for every full 100-step rotation thereafter.
+				counter += 1 + (rotator.steps-startPos)/allDialPositions
 			}
 
-			// New position after rotation (Go-safe modulo)
+			// Update the dial position.
+			// We use (steps % 100) to find the relative movement, subtract it from
+			// the current position, and add 100 before taking the modulo again
+			// to ensure the result is always a positive index between 0 and 99.
 			dialPos = (dialPos - (rotator.steps % allDialPositions) + allDialPositions) % allDialPositions
 		}
-
-		// Logic: If the steps taken meet or exceed the distance to the first zero,
-		// we count 1, then add 1 for every additional 100 steps.
-		if rotator.steps >= distToZero {
-			counter += 1 + (rotator.steps-distToZero)/allDialPositions
-		}
 	}
-
 	return counter
 }
