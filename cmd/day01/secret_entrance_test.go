@@ -113,9 +113,9 @@ func TestMoveDialP1(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := moveDialP1(test.input)
+			got := countDialPointsZero(test.input)
 			if got != test.want {
-				t.Errorf("%s: moveDialP1() = %d; want %d", test.name, got, test.want)
+				t.Errorf("%s: countDialPointsZero() = %d; want %d", test.name, got, test.want)
 			}
 		})
 	}
