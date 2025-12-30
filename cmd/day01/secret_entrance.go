@@ -6,9 +6,10 @@ import (
 	"strings"
 )
 
-const lowestPoint = 0
-const highestPoint = 99
-const allDialPositions = 100
+const zeroPos = 0
+const lastPos = 99
+const allHundredPos = 100
+const moveOneStep = 1
 
 type Rotator struct {
 	direction string
@@ -36,23 +37,23 @@ func countDialPointsZero(rotations []Rotator) int {
 	dialPos := 50
 	counter := 0
 	for _, rotator := range rotations {
-		twoDigitNum := rotator.steps % allDialPositions
+		twoDigitNum := rotator.steps % allHundredPos
 		if rotator.direction == "R" {
-			if (twoDigitNum + dialPos) > highestPoint {
-				dialPos = (dialPos + twoDigitNum) - 1
-				dialPos = dialPos - highestPoint
+			if (twoDigitNum + dialPos) > lastPos {
+				dialPos = (dialPos + twoDigitNum) - moveOneStep
+				dialPos = dialPos - lastPos
 			} else {
 				dialPos += twoDigitNum
 			}
 		} else {
-			if (dialPos - twoDigitNum) < lowestPoint {
-				dialPos = (dialPos - twoDigitNum) + 1
-				dialPos = highestPoint + dialPos
+			if (dialPos - twoDigitNum) < zeroPos {
+				dialPos = (dialPos - twoDigitNum) + moveOneStep
+				dialPos = lastPos + dialPos
 			} else {
 				dialPos -= twoDigitNum
 			}
 		}
-		if dialPos == lowestPoint {
+		if dialPos == zeroPos {
 			counter++
 		}
 	}
@@ -64,28 +65,26 @@ func countDialPointsAndPassedZero(rotations []Rotator) int {
 	counter := 0
 	for _, rotator := range rotations {
 		if rotator.direction == "R" {
-			counter += (dialPos + rotator.steps) / allDialPositions
-			dialPos = (dialPos + rotator.steps) % allDialPositions
+			counter += (dialPos + rotator.steps) / allHundredPos
+			dialPos = (dialPos + rotator.steps) % allHundredPos
 		} else {
 			// If we start at 0, we only hit 0 again after a full 100 steps
 			startPos := dialPos
-			if dialPos == 0 {
-				startPos = allDialPositions
+			if dialPos == zeroPos {
+				startPos = allHundredPos
 			}
 			// Check if we move far enough to reach or pass the '0' mark.
-			// Note: if we start at 0, 'startPos' is 100, meaning we only hit
-			// zero again if we complete a full rotation.
+			// Note: if we start at 0, 'startPos' is 100, meaning we only hit zero again if we complete a full rotation.
 			if rotator.steps >= startPos {
-				// We count 1 for the first time we hit/pass zero,
-				// then add 1 for every full 100-step rotation thereafter.
-				counter += 1 + (rotator.steps-startPos)/allDialPositions
+				// We count 1 for the first time we hit or pass zero.
+				// Then add 1 for every full 100-step rotation thereafter.
+				counter += moveOneStep + (rotator.steps-startPos)/allHundredPos
 			}
 
-			// Update the dial position.
-			// We use (steps % 100) to find the relative movement, subtract it from
-			// the current position, and add 100 before taking the modulo again
-			// to ensure the result is always a positive index between 0 and 99.
-			dialPos = (dialPos - (rotator.steps % allDialPositions) + allDialPositions) % allDialPositions
+			// Update the dial position:
+			// Use (steps % 100) to find the relative movement, subtract it from the current position.
+			// Add 100 before taking the modulo again to ensure the result is always a positive index between 0 and 99.
+			dialPos = (dialPos - (rotator.steps % allHundredPos) + allHundredPos) % allHundredPos
 		}
 	}
 	return counter
