@@ -36,7 +36,7 @@ func parseIDRanges(input string) ([]IDRange, error) {
 func areNumbersRepeating(num int64) bool {
 	const tooSmallToRepeat = 10
 	const divisibleByTen = 10
-	const halveTheAmount = 2
+	const halveAmount = 2
 	const evenNumber = 2
 	if num < tooSmallToRepeat {
 		return false
@@ -53,10 +53,10 @@ func areNumbersRepeating(num int64) bool {
 		return false
 	}
 
-	halvedAmountOfDigits := amountOfDigits / halveTheAmount
+	halvedAmountOfDigits := amountOfDigits / halveAmount
 	divisor := int64(1)
 	for i := 0; i < halvedAmountOfDigits; i++ {
-		divisor *= divisibleByTen // We want to create a number like 10, 100, 1000, etc
+		divisor *= 10 // We want to create a number like 10, 100, 1000, etc
 	}
 
 	firstHalf := num / divisor
