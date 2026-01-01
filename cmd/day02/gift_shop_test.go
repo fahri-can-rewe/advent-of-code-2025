@@ -225,3 +225,77 @@ func TestAreNumbersRepeating(t *testing.T) {
 		})
 	}
 }
+
+func TestGetInvalidIDs(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []IDRange
+		want  []int64
+	}{
+		{
+			name: "single range",
+			input: []IDRange{
+				{10, 22},
+			},
+			want: []int64{11, 22},
+		},
+		{
+			name: "multiple ranges",
+			input: []IDRange{
+				{10, 25},
+				{30, 45},
+			},
+			want: []int64{11, 22, 33, 44},
+		},
+		{
+			name:  "empty input slice",
+			input: []IDRange{},
+			want:  []int64{},
+		},
+		{
+			name: "no invalid ids in range",
+			input: []IDRange{
+				{12, 15},
+			},
+			want: []int64{},
+		},
+		{
+			name: "single point range with invalid id",
+			input: []IDRange{
+				{11, 11},
+			},
+			want: []int64{11},
+		},
+		{
+			name: "single point range with valid id",
+			input: []IDRange{
+				{12, 12},
+			},
+			want: []int64{},
+		},
+		{
+			name: "overlapping ranges",
+			input: []IDRange{
+				{10, 15},
+				{11, 22},
+			},
+			want: []int64{11, 11, 22},
+		},
+		{
+			name: "zero and negative ranges",
+			input: []IDRange{
+				{-11, 11},
+			},
+			want: []int64{11},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := getInvalidIDs(test.input)
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("%s: getInvalidIDs(%v) = %v, want %v", test.name, test.input, got, test.want)
+			}
+		})
+	}
+}
