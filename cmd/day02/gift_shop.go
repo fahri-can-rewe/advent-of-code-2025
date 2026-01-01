@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const everyRegexMatch = -1
@@ -12,17 +14,21 @@ type IDRange struct {
 	end   int64
 }
 
-func parseIDRanges(input string) []IDRange {
-	ranges := make([]IDRange, 0, 100)
-	regex := regexp.MustCompile(`(\d+)-(\d+)`)
-	matches := regex.FindAllStringSubmatch(input, everyRegexMatch)
+func parseIDRanges(input string) ([]IDRange, error) {
+	parts := strings.Split(input, ",")
+	ranges := make([]IDRange, 0, len(parts))
+	regex := regexp.MustCompile(`^(\d+)-(\d+)$`)
 
-	for _, match := range matches {
+	for _, part := range parts {
+		match := regex.FindStringSubmatch(strings.TrimSpace(part))
+		if match == nil {
+			return nil, errors.New("invalid range format: " + part)
+		}
 		start, _ := strconv.ParseInt(match[1], 10, 64)
 		end, _ := strconv.ParseInt(match[2], 10, 64)
 		ranges = append(ranges, IDRange{start: start, end: end})
 	}
-	return ranges
+	return ranges, nil
 }
 
 func areNumbersRepeating(num int64) bool {
@@ -50,7 +56,10 @@ func getInvalidIDs(ranges []IDRange) []int64 {
 }
 
 func SumInvalidIDs(input string) int64 {
-	ranges := parseIDRanges(input)
+	ranges, err := parseIDRanges(input)
+	if err != nil {
+		return 0
+	}
 	invalidIDs := getInvalidIDs(ranges)
 	var sum int64
 	for _, id := range invalidIDs {
