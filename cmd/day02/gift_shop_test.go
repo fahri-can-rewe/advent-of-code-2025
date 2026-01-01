@@ -62,6 +62,36 @@ func TestParseIDRanges(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:    "invalid range format: random text",
+			input:   "abc-def",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "invalid range format: missing hyphen",
+			input:   "12345",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "invalid range format: double hyphen",
+			input:   "10--20",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "invalid range format: extra characters",
+			input:   "10-20abc",
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "invalid range format: empty part",
+			input:   "10-20,,30-40",
+			want:    nil,
+			wantErr: true,
+		},
 	}
 
 	for _, test := range tests {
