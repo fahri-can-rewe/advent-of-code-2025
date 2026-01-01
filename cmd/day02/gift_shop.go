@@ -7,14 +7,13 @@ import (
 	"strings"
 )
 
-const everyRegexMatch = -1
-
 type IDRange struct {
 	start int64
 	end   int64
 }
 
 func parseIDRanges(input string) ([]IDRange, error) {
+	input = strings.TrimSpace(input)
 	parts := strings.Split(input, ",")
 	ranges := make([]IDRange, 0, len(parts))
 	regex := regexp.MustCompile(`^(\d+)-(\d+)$`)
@@ -26,21 +25,44 @@ func parseIDRanges(input string) ([]IDRange, error) {
 		}
 		start, _ := strconv.ParseInt(match[1], 10, 64)
 		end, _ := strconv.ParseInt(match[2], 10, 64)
+		if start > end {
+			return nil, errors.New("invalid range: start cannot be greater than end")
+		}
 		ranges = append(ranges, IDRange{start: start, end: end})
 	}
 	return ranges, nil
 }
 
 func areNumbersRepeating(num int64) bool {
-	s := strconv.FormatInt(num, 10)
-	numLen := len(s)
-
-	if numLen%2 != 0 {
+	const tooSmallToRepeat = 10
+	const divisibleByTen = 10
+	const halveTheAmount = 2
+	const evenNumber = 2
+	if num < tooSmallToRepeat {
 		return false
 	}
 
-	half := numLen / 2
-	return s[:half] == s[half:]
+	var amountOfDigits int
+	temp := num
+	for temp > 0 {
+		temp /= divisibleByTen
+		amountOfDigits++
+	}
+
+	if amountOfDigits%evenNumber != 0 {
+		return false
+	}
+
+	halvedAmountOfDigits := amountOfDigits / halveTheAmount
+	divisor := int64(1)
+	for i := 0; i < halvedAmountOfDigits; i++ {
+		divisor *= divisibleByTen // We want to create a number like 10, 100, 1000, etc
+	}
+
+	firstHalf := num / divisor
+	secondHalf := num % divisor
+
+	return firstHalf == secondHalf
 }
 
 func getInvalidIDs(ranges []IDRange) []int64 {
