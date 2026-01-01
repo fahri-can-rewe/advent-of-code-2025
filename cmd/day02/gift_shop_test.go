@@ -299,3 +299,71 @@ func TestGetInvalidIDs(t *testing.T) {
 		})
 	}
 }
+
+func TestSumInvalidIDs(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int64
+	}{
+		{
+			name:  "single range",
+			input: "10-25",
+			want:  33,
+		},
+		{
+			name:  "multiple ranges",
+			input: "10-25,30-45",
+			want:  110,
+		},
+		{
+			name:  "empty input",
+			input: "",
+			want:  0,
+		},
+		{
+			name:  "invalid range format",
+			input: "abc-def",
+			want:  0,
+		},
+		{
+			name:  "start greater than end",
+			input: "50-40",
+			want:  0,
+		},
+		{
+			name:  "whitespace handling",
+			input: " 10-25 ,  30-45 ",
+			want:  110,
+		},
+		{
+			name:  "overlapping ranges",
+			input: "10-15,11-22",
+			want:  44,
+		},
+		{
+			name:  "no invalid IDs",
+			input: "12-15",
+			want:  0,
+		},
+		{
+			name:  "single point range invalid",
+			input: "11-11",
+			want:  11,
+		},
+		{
+			name:  "single point range valid",
+			input: "12-12",
+			want:  0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := SumInvalidIDs(test.input)
+			if got != test.want {
+				t.Errorf("%s: SumInvalidIDs(%q) = %v, want %v", test.name, test.input, got, test.want)
+			}
+		})
+	}
+}
