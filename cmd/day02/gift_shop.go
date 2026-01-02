@@ -35,19 +35,13 @@ func parseIDRanges(input string) ([]IDRange, error) {
 
 func areNumbersRepeating(num int64) bool {
 	const tooSmallToRepeat = 10
-	const divisibleByTen = 10
 	const halveAmount = 2
 	const evenNumber = 2
 	if num < tooSmallToRepeat {
 		return false
 	}
 
-	var amountOfDigits int
-	temp := num
-	for temp > 0 {
-		temp /= divisibleByTen
-		amountOfDigits++
-	}
+	amountOfDigits := getDigits(num)
 
 	if amountOfDigits%evenNumber != 0 {
 		return false
@@ -65,7 +59,17 @@ func areNumbersRepeating(num int64) bool {
 	return firstHalf == secondHalf
 }
 
-func getInvalidIDs(ranges []IDRange) []int64 {
+func getDigits(num int64) int {
+	var amountOfDigits int
+	temp := num
+	for temp > 0 {
+		temp /= 10
+		amountOfDigits++
+	}
+	return amountOfDigits
+}
+
+func getInvalidIDsP1(ranges []IDRange) []int64 {
 	invalidIDs := make([]int64, 0, 100)
 	for _, r := range ranges {
 		for id := r.start; id <= r.end; id++ {
@@ -77,12 +81,98 @@ func getInvalidIDs(ranges []IDRange) []int64 {
 	return invalidIDs
 }
 
-func SumInvalidIDs(input string) int64 {
+func getInvalidIDsP2(ranges []IDRange) []int64 {
+	invalidIDs := make([]int64, 0, 100)
+	for _, r := range ranges {
+		for id := r.start; id <= r.end; id++ {
+			if areNumbersRepeating(id) {
+				invalidIDs = append(invalidIDs, id)
+			} else if isSameDigit(id) {
+				invalidIDs = append(invalidIDs, id)
+			} else if isRepeating := checkRepeatingTwoDigitNum(id); isRepeating == true {
+				invalidIDs = append(invalidIDs, id)
+			} else if isRepeating := checkRepeatingThreeDigitNum(id, 0, getDigits(id)); isRepeating == true {
+				invalidIDs = append(invalidIDs, id)
+			}
+		}
+	}
+	return invalidIDs
+}
+
+func checkRepeatingTwoDigitNum(num int64) bool {
+	if num > 100 {
+		amountOfDigits := getDigits(num)
+		temp := num / 100
+		tempDigits := amountOfDigits / 2
+		lastDigits := num % 100
+		if lastDigits <= 1 {
+			return false
+		}
+		for i := 0; i < tempDigits; i++ {
+			if temp%lastDigits != 0 {
+				break
+			}
+			if temp == lastDigits {
+				return true
+			}
+			temp /= 100
+			if temp == 0 {
+				return false
+			}
+		}
+	}
+	return false
+}
+
+func checkRepeatingThreeDigitNum(num int64, temp int64, amountOfDigits int) bool {
+	temp = num / 1000
+	tempDigits := amountOfDigits - 3
+	lastDigits := num % 1000
+	if lastDigits <= 1 {
+		return false
+	}
+	for i := 0; i < tempDigits; i++ {
+		if temp%lastDigits != 0 {
+			break
+		}
+		tempDigits -= 3
+		temp /= 1000
+		if tempDigits == 0 && temp == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func isSameDigit(num int64) bool {
+	if num < 0 {
+		num = -num // Handle negative numbers
+	}
+	if num < 10 {
+		return true // Single digits always consist of the same digit
+	}
+
+	lastDigit := num % 10
+	for num > 0 {
+		if num%10 != lastDigit {
+			return false
+		}
+		num /= 10
+	}
+	return true
+}
+
+func SumInvalidIDs(input string, isPartOne bool) int64 {
 	ranges, err := parseIDRanges(input)
 	if err != nil {
 		return 0
 	}
-	invalidIDs := getInvalidIDs(ranges)
+	var invalidIDs []int64
+	if isPartOne {
+		invalidIDs = getInvalidIDsP1(ranges)
+	} else {
+		invalidIDs = getInvalidIDsP2(ranges)
+	}
 	var sum int64
 	for _, id := range invalidIDs {
 		sum += id
