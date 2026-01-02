@@ -12,6 +12,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println("The sum of invalid IDs for Part 1 is: ", SumInvalidIDs(input, true))
+	fmt.Println("The sum of invalid IDs for Part 1 is: ", SumInvalidIDs(input, true))
 	fmt.Println("The sum of invalid IDs for Part 2 is: ", SumInvalidIDs(input, false))
 }

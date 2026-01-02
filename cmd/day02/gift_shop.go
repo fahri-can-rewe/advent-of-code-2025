@@ -34,39 +34,13 @@ func parseIDRanges(input string) ([]IDRange, error) {
 }
 
 func areNumbersRepeating(num int64) bool {
-	const tooSmallToRepeat = 10
-	const halveAmount = 2
-	const evenNumber = 2
-	if num < tooSmallToRepeat {
+	s := strconv.FormatInt(num, 10)
+	n := len(s)
+	if n < 2 || n%2 != 0 {
 		return false
 	}
-
-	amountOfDigits := getDigits(num)
-
-	if amountOfDigits%evenNumber != 0 {
-		return false
-	}
-
-	halvedAmountOfDigits := amountOfDigits / halveAmount
-	divisor := int64(1)
-	for i := 0; i < halvedAmountOfDigits; i++ {
-		divisor *= 10 // We want to create a number like 10, 100, 1000, etc
-	}
-
-	firstHalf := num / divisor
-	secondHalf := num % divisor
-
-	return firstHalf == secondHalf
-}
-
-func getDigits(num int64) int {
-	var amountOfDigits int
-	temp := num
-	for temp > 0 {
-		temp /= 10
-		amountOfDigits++
-	}
-	return amountOfDigits
+	half := n / 2
+	return s[:half] == s[half:]
 }
 
 func getInvalidIDsP1(ranges []IDRange) []int64 {
@@ -81,85 +55,41 @@ func getInvalidIDsP1(ranges []IDRange) []int64 {
 	return invalidIDs
 }
 
+func isInvalidID(num int64) bool {
+	textNum := strconv.FormatInt(num, 10)
+	amountOfDigits := len(textNum)
+	if amountOfDigits < 2 {
+		return false
+	}
+	// Try all possible lengths of the repeating sequence
+	for l := 1; l <= amountOfDigits/2; l++ {
+		if amountOfDigits%l == 0 {
+			pattern := textNum[:l]
+			isRepeating := true
+			for i := l; i < amountOfDigits; i += l {
+				if textNum[i:i+l] != pattern {
+					isRepeating = false
+					break
+				}
+			}
+			if isRepeating {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func getInvalidIDsP2(ranges []IDRange) []int64 {
 	invalidIDs := make([]int64, 0, 100)
 	for _, r := range ranges {
 		for id := r.start; id <= r.end; id++ {
-			if areNumbersRepeating(id) {
-				invalidIDs = append(invalidIDs, id)
-			} else if isSameDigit(id) {
-				invalidIDs = append(invalidIDs, id)
-			} else if isRepeating := checkRepeatingTwoDigitNum(id); isRepeating == true {
-				invalidIDs = append(invalidIDs, id)
-			} else if isRepeating := checkRepeatingThreeDigitNum(id, 0, getDigits(id)); isRepeating == true {
+			if isInvalidID(id) {
 				invalidIDs = append(invalidIDs, id)
 			}
 		}
 	}
 	return invalidIDs
-}
-
-func checkRepeatingTwoDigitNum(num int64) bool {
-	if num > 100 {
-		amountOfDigits := getDigits(num)
-		temp := num / 100
-		tempDigits := amountOfDigits / 2
-		lastDigits := num % 100
-		if lastDigits <= 1 {
-			return false
-		}
-		for i := 0; i < tempDigits; i++ {
-			if temp%lastDigits != 0 {
-				break
-			}
-			if temp == lastDigits {
-				return true
-			}
-			temp /= 100
-			if temp == 0 {
-				return false
-			}
-		}
-	}
-	return false
-}
-
-func checkRepeatingThreeDigitNum(num int64, temp int64, amountOfDigits int) bool {
-	temp = num / 1000
-	tempDigits := amountOfDigits - 3
-	lastDigits := num % 1000
-	if lastDigits <= 1 {
-		return false
-	}
-	for i := 0; i < tempDigits; i++ {
-		if temp%lastDigits != 0 {
-			break
-		}
-		tempDigits -= 3
-		temp /= 1000
-		if tempDigits == 0 && temp == 0 {
-			return true
-		}
-	}
-	return false
-}
-
-func isSameDigit(num int64) bool {
-	if num < 0 {
-		num = -num // Handle negative numbers
-	}
-	if num < 10 {
-		return true // Single digits always consist of the same digit
-	}
-
-	lastDigit := num % 10
-	for num > 0 {
-		if num%10 != lastDigit {
-			return false
-		}
-		num /= 10
-	}
-	return true
 }
 
 func SumInvalidIDs(input string, isPartOne bool) int64 {

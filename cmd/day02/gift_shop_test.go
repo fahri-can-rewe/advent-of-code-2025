@@ -108,7 +108,7 @@ func TestParseIDRanges(t *testing.T) {
 	}
 }
 
-func TestAreNumbersRepeating(t *testing.T) {
+func TestIsInvalidID(t *testing.T) {
 	tests := []struct {
 		name string
 		num  int64
@@ -130,9 +130,9 @@ func TestAreNumbersRepeating(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "non-repeating three digit number",
+			name: "repeating three digit number",
 			num:  111,
-			want: false,
+			want: true,
 		},
 		{
 			name: "repeating four digit number",
@@ -214,19 +214,29 @@ func TestAreNumbersRepeating(t *testing.T) {
 			num:  1100,
 			want: false,
 		},
+		{
+			name: "example repeating sequence twice",
+			num:  12341234,
+			want: true,
+		},
+		{
+			name: "example repeating sequence thrice",
+			num:  123123123,
+			want: true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := areNumbersRepeating(test.num)
+			got := isInvalidID(test.num)
 			if got != test.want {
-				t.Errorf("%s: areNumbersRepeating(%d) = %v, want %v", test.name, test.num, got, test.want)
+				t.Errorf("%s: isInvalidID(%d) = %v, want %v", test.name, test.num, got, test.want)
 			}
 		})
 	}
 }
 
-func TestGetInvalidIDs(t *testing.T) {
+func TestGetInvalidIDsP1(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []IDRange
@@ -292,15 +302,15 @@ func TestGetInvalidIDs(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := getInvalidIDs(test.input)
+			got := getInvalidIDsP1(test.input)
 			if !reflect.DeepEqual(got, test.want) {
-				t.Errorf("%s: getInvalidIDs(%v) = %v, want %v", test.name, test.input, got, test.want)
+				t.Errorf("%s: getInvalidIDsP1(%v) = %v, want %v", test.name, test.input, got, test.want)
 			}
 		})
 	}
 }
 
-func TestSumInvalidIDs(t *testing.T) {
+func TestSumInvalidIDs_P1(t *testing.T) {
 	tests := []struct {
 		name  string
 		input string
@@ -360,7 +370,55 @@ func TestSumInvalidIDs(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := SumInvalidIDs(test.input)
+			got := SumInvalidIDs(test.input, true)
+			if got != test.want {
+				t.Errorf("%s: SumInvalidIDs(%q) = %v, want %v", test.name, test.input, got, test.want)
+			}
+		})
+	}
+}
+
+func TestSumInvalidIDs_P2(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int64
+	}{
+		{
+			name:  "single range",
+			input: "11-22",
+			want:  33,
+		},
+		{
+			name:  "multiple ranges",
+			input: "95-115,998-1012",
+			want:  2219,
+		},
+		{
+			name:  "multiple ranges",
+			input: "1188511880-1188511890",
+			want:  1188511885,
+		},
+		{
+			name:  "multiple ranges",
+			input: "565653-565659",
+			want:  565656,
+		},
+		{
+			name:  "multiple ranges",
+			input: "824824821-824824827",
+			want:  824824824,
+		},
+		{
+			name:  "multiple ranges",
+			input: "2121212118-2121212124",
+			want:  2121212121,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := SumInvalidIDs(test.input, false)
 			if got != test.want {
 				t.Errorf("%s: SumInvalidIDs(%q) = %v, want %v", test.name, test.input, got, test.want)
 			}
