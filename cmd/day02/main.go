@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	input, err := util.ReadInput("../advent-of-code-2025/cmd/day02/input3.txt")
+	input, err := util.ReadInput("../advent-of-code-2025/cmd/day02/input2.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
