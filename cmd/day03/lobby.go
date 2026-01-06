@@ -23,10 +23,47 @@ func parseInput(input string) [][]int {
 	return result
 }
 
+func isHighestNum(nums []int) bool {
+	if len(nums) < 2 {
+		return false
+	}
+	lastIdx := len(nums) - 1
+	if nums[0] == biggestDigit && nums[1] == biggestDigit {
+		return true
+	}
+	if len(nums) > 2 {
+		if nums[0] == biggestDigit && nums[lastIdx] == biggestDigit {
+			return true
+		}
+		if nums[1] == biggestDigit && nums[lastIdx] == biggestDigit {
+			return true
+		}
+	}
+	return false
+}
+
+func findSecondDigit(idxBiggest int, nums []int) int {
+	idxLastNum := 1
+	startIdx := idxBiggest + 1
+	for i := startIdx; i < len(nums); i++ {
+		if idxLastNum < nums[i] {
+			idxLastNum = nums[i]
+			idxBiggest = i
+		}
+	}
+	return idxLastNum
+}
+
 func findTwoLargestDigits(nums []int) int {
 	const biggestNum = 99
+	if len(nums) == 0 {
+		return 0
+	}
 	if isHighestNum(nums) {
 		return biggestNum
+	}
+	if len(nums) == 1 {
+		return nums[0]
 	}
 	firstDigit := nums[0]
 	secondDigit := 1
@@ -46,32 +83,7 @@ func findTwoLargestDigits(nums []int) int {
 	}
 	combinedNums := fmt.Sprintf("%d%d", firstDigit, secondDigit)
 	result, _ := strconv.Atoi(combinedNums)
-	fmt.Println(result)
 	return result
-}
-
-func findSecondDigit(idxBiggest int, nums []int) int {
-	idxLastNum := 1
-	startIdx := idxBiggest + 1
-	for i := startIdx; i < len(nums); i++ {
-		if idxLastNum < nums[i] {
-			idxLastNum = nums[i]
-			idxBiggest = i
-		}
-	}
-	return idxLastNum
-}
-
-func isHighestNum(nums []int) bool {
-	lastIdx := len(nums) - 1
-	if nums[0] == biggestDigit && nums[1] == biggestDigit {
-		return true
-	} else if nums[0] == biggestDigit && nums[lastIdx] == biggestDigit {
-		return true
-	} else if nums[1] == biggestDigit && nums[lastIdx] == biggestDigit {
-		return true
-	}
-	return false
 }
 
 func sumUpJoltages(input string) int {
