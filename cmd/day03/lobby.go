@@ -91,7 +91,6 @@ func sumUpJoltages(input string, isPartTwo bool) int64 {
 		if isPartTwo {
 			idxBiggestNum := findIdxOfBiggestNum(row, len(row)-totalDigits+1)
 			arr := findRemainingDigits(idxBiggestNum, row)
-			//fmt.Println(transformArrToInt(arr))
 			sum += transformArrToInt(arr)
 		} else {
 			sum += int64(findTwoLargestDigits(row))
@@ -136,12 +135,6 @@ func findRemainingDigits(idxBiggest int, nums []int) []int {
 		stack = stack[:len(stack)-1]
 		removed++
 	}
-
-	// Ensure we only return totalDigits
-	if len(stack) > totalDigits {
-		stack = stack[:totalDigits]
-	}
-
 	return stack
 }
 
