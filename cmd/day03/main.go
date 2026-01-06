@@ -12,5 +12,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Day03: ", input)
+
+	fmt.Println("Part 1 total joltage output: ", sumUpJoltages(input))
 }
