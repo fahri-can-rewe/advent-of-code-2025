@@ -8,10 +8,11 @@ import (
 )
 
 func main() {
-	input, err := util.ReadInput("../advent-of-code-2025/cmd/day03/input_test.txt")
+	input, err := util.ReadInput("../advent-of-code-2025/cmd/day03/input1.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Part 1 total joltage output: ", sumUpJoltages(input))
+	fmt.Println("Part 1 total joltage output: ", sumUpJoltages(input, false))
+	fmt.Println("Part 2 total joltage output: ", sumUpJoltages(input, true))
 }

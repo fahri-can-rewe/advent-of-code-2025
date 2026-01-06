@@ -81,25 +81,25 @@ func findTwoLargestDigits(nums []int) int {
 	return result
 }
 
-func sumUpJoltages(input string, isPartTwo bool) int {
+func sumUpJoltages(input string, isPartTwo bool) int64 {
 	banks := parseInput(input)
-	var sum int
+	var sum int64
 	for _, row := range banks {
+		if len(row) == 0 {
+			continue
+		}
 		if isPartTwo {
-			idxBiggestNUm := findIdxOfBiggestNum(row, len(row)-totalDigits)
-			arr := findRemainingDigits(idxBiggestNUm, row)
-			fmt.Println(transformArrToInt(arr))
+			idxBiggestNum := findIdxOfBiggestNum(row, len(row)-totalDigits+1)
+			arr := findRemainingDigits(idxBiggestNum, row)
+			//fmt.Println(transformArrToInt(arr))
+			sum += transformArrToInt(arr)
 		} else {
-			sum += findTwoLargestDigits(row)
+			sum += int64(findTwoLargestDigits(row))
 		}
 	}
 
 	return sum
 }
-
-//2. check from the biggest number index how many digits are currently left
-//3. check how many digits you have to eliminate to get the remaining 11 biggest digits
-//4. save your 12-digit number and return it
 
 func findIdxOfBiggestNum(nums []int, lastPos int) int {
 	idxBiggest := 0
@@ -110,35 +110,39 @@ func findIdxOfBiggestNum(nums []int, lastPos int) int {
 			biggestNum = nums[i]
 		}
 	}
-	//fmt.Printf("Biggest number: %d index: %d\n", biggestNum, idxBiggest)
 	return idxBiggest
 }
 
 func findRemainingDigits(idxBiggest int, nums []int) []int {
-	fmt.Println(nums)
-	twelveDigitNum := make([]int, 0, 12)
-	twelveDigitNum = append(twelveDigitNum, nums[idxBiggest])
-	amountRemainingDigits := len(nums) - idxBiggest - 1
-	amountDigitsToCancel := len(nums) - 12 - idxBiggest
-	i := idxBiggest + 1
-	lastIdx := i
-	for amountDigitsToCancel > 0 {
-		if i == len(nums)-1 {
-			break
-		}
-		if nums[i] > nums[i+1] {
-			twelveDigitNum = append(twelveDigitNum, nums[i])
-			amountRemainingDigits--
-			lastIdx = i
-		} else if nums[i] > nums[i-1] {
-			twelveDigitNum = append(twelveDigitNum, nums[i])
-			amountRemainingDigits--
-			lastIdx = i
-		}
-		i++
+	remaining := nums[idxBiggest:]
+	toRemove := len(remaining) - totalDigits
+
+	if toRemove <= 0 {
+		return remaining
 	}
-	twelveDigitNum = append(twelveDigitNum, nums[lastIdx+1:]...)
-	return twelveDigitNum
+
+	var stack []int
+	removed := 0
+	for _, num := range remaining {
+		for removed < toRemove && len(stack) > 1 && stack[len(stack)-1] < num {
+			stack = stack[:len(stack)-1]
+			removed++
+		}
+		stack = append(stack, num)
+	}
+
+	// If we still need to remove digits, remove from the end
+	for removed < toRemove {
+		stack = stack[:len(stack)-1]
+		removed++
+	}
+
+	// Ensure we only return totalDigits
+	if len(stack) > totalDigits {
+		stack = stack[:totalDigits]
+	}
+
+	return stack
 }
 
 func transformArrToInt(nums []int) int64 {

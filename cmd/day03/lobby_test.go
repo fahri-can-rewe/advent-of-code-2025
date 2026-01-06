@@ -261,9 +261,10 @@ func TestFindTwoLargestDigits(t *testing.T) {
 
 func TestSumUpJoltages(t *testing.T) {
 	tests := []struct {
-		name  string
-		input string
-		want  int
+		name      string
+		input     string
+		isPartTwo bool
+		want      int64
 	}{
 		{
 			name:  "whitespace only",
@@ -290,13 +291,86 @@ func TestSumUpJoltages(t *testing.T) {
 			input: "  123  \n  456  ",
 			want:  87,
 		},
+		{
+			name:      "part two - user reported case",
+			input:     "234234234234278",
+			isPartTwo: true,
+			want:      434234234278,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := sumUpJoltages(test.input, false)
+			got := sumUpJoltages(test.input, test.isPartTwo)
 			if got != test.want {
-				t.Errorf("sumUpJoltages(%q) = %v, want %v", test.input, got, test.want)
+				t.Errorf("sumUpJoltages(%q, %v) = %v, want %v", test.input, test.isPartTwo, got, test.want)
+			}
+		})
+	}
+}
+
+func TestFindRemainingDigits(t *testing.T) {
+	tests := []struct {
+		name       string
+		idxBiggest int
+		nums       []int
+		want       []int
+	}{
+		{
+			name:       "user reported case",
+			idxBiggest: 2,
+			nums:       []int{2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8},
+			want:       []int{4, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8},
+		},
+		{
+			name:       "exactly 12 digits after idx",
+			idxBiggest: 0,
+			nums:       []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+			want:       []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+		},
+		{
+			name:       "fewer than 12 digits",
+			idxBiggest: 0,
+			nums:       []int{1, 2, 3},
+			want:       []int{1, 2, 3},
+		},
+		{
+			name:       "increasing digits (greedy choice)",
+			idxBiggest: 0,
+			nums:       []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
+			want:       []int{1, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
+		},
+		{
+			name:       "decreasing digits (removes from end)",
+			idxBiggest: 0,
+			nums:       []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 9, 8, 7, 6},
+			want:       []int{9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6},
+		},
+		{
+			name:       "all same digits",
+			idxBiggest: 0,
+			nums:       []int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+			want:       []int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+		},
+		{
+			name:       "preserve first digit even if small",
+			idxBiggest: 0,
+			nums:       []int{1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+			want:       []int{1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+		},
+		{
+			name:       "many removals",
+			idxBiggest: 0,
+			nums:       []int{9, 1, 1, 1, 1, 1, 9, 1, 1, 1, 1, 1, 9, 1, 1, 1, 1, 1, 9},
+			want:       []int{9, 9, 1, 1, 1, 9, 1, 1, 1, 1, 1, 9},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := findRemainingDigits(test.idxBiggest, test.nums)
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("findRemainingDigits(%d, %v) = %v, want %v", test.idxBiggest, test.nums, got, test.want)
 			}
 		})
 	}
