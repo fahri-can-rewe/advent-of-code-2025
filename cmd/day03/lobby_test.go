@@ -294,7 +294,7 @@ func TestSumUpJoltages(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := sumUpJoltages(test.input)
+			got := sumUpJoltages(test.input, false)
 			if got != test.want {
 				t.Errorf("sumUpJoltages(%q) = %v, want %v", test.input, got, test.want)
 			}
