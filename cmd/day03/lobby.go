@@ -123,6 +123,7 @@ func findRemainingDigits(idxBiggest int, nums []int) []int {
 	var stack []int
 	removed := 0
 	for _, num := range remaining {
+		// (stack[len(stack)-1] < num): The last digit added to the stack is smaller than the current digit
 		for removed < toRemove && len(stack) > 1 && stack[len(stack)-1] < num {
 			stack = stack[:len(stack)-1]
 			removed++
