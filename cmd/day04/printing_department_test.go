@@ -24,3 +24,24 @@ func TestCountForkliftAccess(t *testing.T) {
 		t.Errorf("got %d, want %d", got, want)
 	}
 }
+
+func TestDelAsMuchPaperAsPossible(t *testing.T) {
+	input := `..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+`
+	grid := parseInput(input)
+	got := delAsMuchPaperAsPossible(grid)
+	want := 43
+
+	if got != want {
+		t.Errorf("got %d, want %d", got, want)
+	}
+}

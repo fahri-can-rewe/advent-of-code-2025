@@ -4,6 +4,8 @@ import (
 	"strings"
 )
 
+const maxAllowedNeighbors = 4
+
 func parseInput(input string) [][]rune {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	var result [][]rune
@@ -15,7 +17,6 @@ func parseInput(input string) [][]rune {
 }
 
 func countForkliftAccess(grid [][]rune) int {
-	const maxAllowedNeighbors = 4
 	totalX := 0
 	rows := len(grid)
 	cols := len(grid[0])
@@ -52,4 +53,33 @@ func countNeighbors(grid [][]rune, row, column int) int {
 		}
 	}
 	return count
+}
+
+func delAsMuchPaperAsPossible(grid [][]rune) int {
+	totalRemoved := 0
+	for {
+		toRemove := saveCoordToRemove(grid)
+		if len(toRemove) == 0 {
+			break
+		}
+		totalRemoved += len(toRemove)
+		for _, coord := range toRemove {
+			grid[coord[0]][coord[1]] = '.'
+		}
+	}
+	return totalRemoved
+}
+
+func saveCoordToRemove(grid [][]rune) [][]int {
+	var toRemove [][]int
+	for row := 0; row < len(grid); row++ {
+		for col := 0; col < len(grid[0]); col++ {
+			if grid[row][col] == '@' {
+				if countNeighbors(grid, row, col) < maxAllowedNeighbors {
+					toRemove = append(toRemove, []int{row, col})
+				}
+			}
+		}
+	}
+	return toRemove
 }

@@ -14,7 +14,9 @@ func main() {
 	}
 
 	grid := parseInput(input)
-	result := countForkliftAccess(grid)
+	resPart1 := countForkliftAccess(grid)
+	resPart2 := delAsMuchPaperAsPossible(grid)
 
-	fmt.Println("Part 1 accessible rolls of paper: ", result)
+	fmt.Println("Part 1 accessible rolls of paper: ", resPart1)
+	fmt.Println("Part 2 rolls of paper which can be removed: ", resPart2)
 }
