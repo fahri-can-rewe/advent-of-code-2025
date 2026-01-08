@@ -4,29 +4,26 @@ import (
 	"strings"
 )
 
-func parseInput(input string) [][]string {
+func parseInput(input string) [][]rune {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
-	var result [][]string
+	var result [][]rune
 
 	for _, line := range lines {
-		var row []string
-		for _, char := range line {
-			row = append(row, string(char))
-		}
-		result = append(result, row)
+		result = append(result, []rune(line))
 	}
 	return result
 }
 
-func countForkliftAccess(grid [][]string) int {
+func countForkliftAccess(grid [][]rune) int {
+	const maxAllowedNeighbors = 4
 	totalX := 0
 	rows := len(grid)
 	cols := len(grid[0])
 
 	for row := 0; row < rows; row++ {
 		for col := 0; col < cols; col++ {
-			if grid[row][col] == "@" {
-				if countNeighbors(grid, row, col) < 4 {
+			if grid[row][col] == '@' {
+				if countNeighbors(grid, row, col) < maxAllowedNeighbors {
 					totalX++
 				}
 			}
@@ -35,7 +32,7 @@ func countForkliftAccess(grid [][]string) int {
 	return totalX
 }
 
-func countNeighbors(grid [][]string, row, column int) int {
+func countNeighbors(grid [][]rune, row, column int) int {
 	count := 0
 	rows := len(grid)
 	cols := len(grid[0])
@@ -46,8 +43,9 @@ func countNeighbors(grid [][]string, row, column int) int {
 				continue
 			}
 			neighborRow, neighborCol := row+deltaRow, column+deltaCol
-			if neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols {
-				if grid[neighborRow][neighborCol] == "@" {
+			areCoordinatesWithinBound := neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols
+			if areCoordinatesWithinBound {
+				if grid[neighborRow][neighborCol] == '@' {
 					count++
 				}
 			}
