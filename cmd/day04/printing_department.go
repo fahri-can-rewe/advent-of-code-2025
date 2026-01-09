@@ -73,7 +73,8 @@ func delAsMuchPaperAsPossible(grid [][]rune) int {
 func saveCoordToRemove(grid [][]rune) [][]int {
 	var toRemove [][]int
 	for row := 0; row < len(grid); row++ {
-		for col := 0; col < len(grid[0]); col++ {
+		cols := len(grid[0]) // every row has the same number of columns
+		for col := 0; col < cols; col++ {
 			if grid[row][col] == '@' {
 				if countNeighbors(grid, row, col) < maxAllowedNeighbors {
 					toRemove = append(toRemove, []int{row, col})
