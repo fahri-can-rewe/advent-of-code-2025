@@ -12,7 +12,7 @@ const leftNumBeforeDash = 1
 const rightNumAfterDash = 2
 
 func parseInput(input string) ([][]int64, []int64) {
-	sections := strings.Split(strings.TrimSpace(input), "\n\n")
+	sections := strings.Split(input, "\n\n")
 	var idRanges [][]int64
 	var validIDs []int64
 
