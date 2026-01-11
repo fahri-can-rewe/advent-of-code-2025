@@ -117,3 +117,77 @@ func TestSumUpCalculations(t *testing.T) {
 		})
 	}
 }
+
+func TestApplyCephalopodMath(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int64
+	}{
+		{
+			name: "example worksheet",
+			input: `123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  `,
+			want: 3263827,
+		},
+		{
+			name: "single problem addition",
+			input: `1
+2
++`,
+			want: 12,
+		},
+		{
+			name: "single problem multiplication",
+			input: `2
+3
+*`,
+			want: 23,
+		},
+		{
+			name: "two problems",
+			input: `1 2
+2 3
++ *`,
+			want: 35,
+		},
+		{
+			name: "multiple digits in column",
+			input: `1
+2
+3
++`,
+			want: 123,
+		},
+		{
+			name: "multi-column problem addition",
+			input: `12
+23
++ `,
+			want: 35,
+		},
+		{
+			name: "multi-column problem multiplication",
+			input: `12
+23
+* `,
+			want: 276,
+		},
+		{
+			name:  "empty input",
+			input: "",
+			want:  0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := applyCephalopodMath(test.input)
+			if got != test.want {
+				t.Errorf("applyCephalopodMath(%q) = %v; want %v", test.input, got, test.want)
+			}
+		})
+	}
+}
