@@ -2,23 +2,22 @@ package main
 
 import "strings"
 
-func parseInput(input string) [][]string {
+func parseInput(input string) [][]rune {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
-	diagram := make([][]string, len(lines))
+	diagram := make([][]rune, len(lines))
 
 	for i, line := range lines {
-		//diagram[i] = []string(line)
-		diagram[i] = strings.Split(line, "")
+		diagram[i] = []rune(line)
 	}
 
 	return diagram
 }
 
-func findS(diagram [][]string) int {
+func findS(diagram [][]rune) int {
 	var pos int
 	for i := 0; i < len(diagram); i++ {
 		for j := 0; j < len(diagram[i]); j++ {
-			if diagram[i][j] == "S" {
+			if diagram[i][j] == 'S' {
 				pos = j
 			}
 		}
@@ -26,42 +25,53 @@ func findS(diagram [][]string) int {
 	return pos
 }
 
-func copyVal(diagram [][]string) [][]string {
-	beams := make([][]string, len(diagram))
+func countBeamSplitters(diagram [][]rune) int {
+	rows := len(diagram)
+	cols := len(diagram[0])
 
-	for i := range diagram {
-		// Create the inner slice with the same length
-		beams[i] = make([]string, len(diagram[i]))
-		// Copy the contents from diagram[i] to beams[i]
-		copy(beams[i], diagram[i])
+	beamAt := make([][]bool, rows)
+	for i := range beamAt {
+		beamAt[i] = make([]bool, cols)
 	}
-	return beams
-}
 
-func countBeamSplitters(diagram [][]string) int {
-	beams := copyVal(diagram)
-	sPos := findS(diagram)
-	counter := 0
-	lastRow := len(diagram) - 1
-	lastCol := len(diagram[0]) - 1
+	sCol := findS(diagram)
+	// The beam starts at S and always moves downward.
+	// We can process row by row.
+	beamAt[0][sCol] = true
 
-	for i := 2; i < len(diagram); i++ {
-		for j := 0; j <= lastCol; j++ {
-			if diagram[i][j] == "^" && i == 2 && j == sPos {
-				beams[i+1][j-1] = "|"
-				beams[i+1][j+1] = "|"
-				counter++
+	splittersCounted := make(map[[2]int]bool)
+
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if !beamAt[r][c] {
+				continue
 			}
-			if diagram[i][j] == "^" && beams[i-1][j] == "|" {
-				if j != 0 && i < lastRow {
-					beams[i+1][j-1] = "|"
-				}
-				if j != lastCol && i < lastRow {
-					beams[i+1][j+1] = "|"
-				}
-				counter++
-			}
+
+			checkForSplitters(diagram, r, c, splittersCounted, rows, beamAt, cols)
 		}
 	}
-	return counter
+
+	return len(splittersCounted)
+}
+
+func checkForSplitters(diagram [][]rune, r int, c int, splittersCounted map[[2]int]bool, rows int, beamAt [][]bool, cols int) {
+	// If it's a splitter, it stops the beam and emits two new ones
+	if diagram[r][c] == '^' {
+		splittersCounted[[2]int{r, c}] = true
+		// New beams continue from immediate left and immediate right
+		if r+1 < rows {
+			if c > 0 {
+				beamAt[r+1][c-1] = true
+			}
+			if c+1 < cols {
+				beamAt[r+1][c+1] = true
+			}
+		}
+	} else {
+		// For empty space (.) or start (S) or already formed beam (|),
+		// the beam continues downward.
+		if r+1 < rows {
+			beamAt[r+1][c] = true
+		}
+	}
 }
