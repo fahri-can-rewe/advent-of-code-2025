@@ -8,11 +8,12 @@ import (
 )
 
 func main() {
-	input, err := util.ReadInput("cmd/day08/input_sample.txt")
+	input, err := util.ReadInput("cmd/day08/input1.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
+	connections := 1000
 	points := parseInput(input)
-	p1 := solve(points)
+	p1 := solve(points, connections)
 	fmt.Println("Part 1 three largest circuits ", p1)
 }

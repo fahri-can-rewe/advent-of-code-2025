@@ -77,8 +77,7 @@ func (uf *UnionFind) Union(i, j int) {
 	}
 }
 
-func solve(points []Point) int64 {
-	connections := 1000
+func solve(points []Point, connections int) int64 {
 	n := len(points)
 	pairs := make([]Pair, 0, n*(n-1)/2)
 	for i := 0; i < n; i++ {
