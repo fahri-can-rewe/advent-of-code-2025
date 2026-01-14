@@ -75,3 +75,56 @@ func checkForSplitters(diagram [][]rune, r int, c int, splittersCounted map[[2]i
 		}
 	}
 }
+
+func countTimelines(diagram [][]rune) int64 {
+	rows := len(diagram)
+	if rows == 0 {
+		return 0
+	}
+	cols := len(diagram[0])
+
+	ways := make([][]int64, rows)
+	for i := range ways {
+		ways[i] = make([]int64, cols)
+	}
+
+	sCol := findS(diagram)
+	ways[0][sCol] = 1
+
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if ways[r][c] == 0 {
+				continue
+			}
+
+			checkForTimelines(diagram, r, c, rows, ways, cols)
+		}
+	}
+
+	// The total number of timelines is the sum of ways in the last row
+	var total int64
+	for c := 0; c < cols; c++ {
+		total += ways[rows-1][c]
+	}
+
+	return total
+}
+
+func checkForTimelines(diagram [][]rune, r int, c int, rows int, ways [][]int64, cols int) {
+	if diagram[r][c] == '^' {
+		// Hits a splitter, branches into two timelines in the NEXT row
+		if r+1 < rows {
+			if c > 0 {
+				ways[r+1][c-1] += ways[r][c]
+			}
+			if c+1 < cols {
+				ways[r+1][c+1] += ways[r][c]
+			}
+		}
+	} else {
+		// Continues downward
+		if r+1 < rows {
+			ways[r+1][c] += ways[r][c]
+		}
+	}
+}

@@ -15,4 +15,6 @@ func main() {
 	diagram := parseInput(input)
 	p1 := countBeamSplitters(diagram)
 	fmt.Println("Part 1 tachyon beam split total of: ", p1)
+	p2 := countTimelines(diagram)
+	fmt.Println("Part 2 total timelines: ", p2)
 }
