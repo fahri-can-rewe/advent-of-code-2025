@@ -15,5 +15,7 @@ func main() {
 	connections := 1000
 	points := parseInput(input)
 	p1 := solve(points, connections)
-	fmt.Println("Part 1 three largest circuits ", p1)
+	fmt.Println("Part 1 size of three largest circuits:", p1)
+	p2 := solvePart2(points)
+	fmt.Println("Part 2 last connection X product:", p2)
 }

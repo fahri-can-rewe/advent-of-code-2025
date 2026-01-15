@@ -119,3 +119,42 @@ func solve(points []Point, connections int) int64 {
 	}
 	return result
 }
+
+func solvePart2(points []Point) int64 {
+	n := len(points)
+	pairs := make([]Pair, 0, n*(n-1)/2)
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			pairs = append(pairs, Pair{i, j, distSq(points[i], points[j])})
+		}
+	}
+
+	sort.Slice(pairs, func(i, j int) bool {
+		if pairs[i].distSq != pairs[j].distSq {
+			return pairs[i].distSq < pairs[j].distSq
+		}
+		if pairs[i].p1 != pairs[j].p1 {
+			return pairs[i].p1 < pairs[j].p1
+		}
+		return pairs[i].p2 < pairs[j].p2
+	})
+
+	uf := NewUnionFind(n)
+	numCircuits := n
+	var lastXProduct int64
+
+	for _, p := range pairs {
+		root1 := uf.Find(p.p1)
+		root2 := uf.Find(p.p2)
+		if root1 != root2 {
+			uf.Union(p.p1, p.p2)
+			numCircuits--
+			if numCircuits == 1 {
+				lastXProduct = points[p.p1].x * points[p.p2].x
+				break
+			}
+		}
+	}
+
+	return lastXProduct
+}
