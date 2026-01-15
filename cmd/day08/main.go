@@ -14,8 +14,8 @@ func main() {
 	}
 	connections := 1000
 	points := parseInput(input)
-	p1 := solve(points, connections)
+	p1 := connectJunctionBoxes(points, connections)
 	fmt.Println("Part 1 size of three largest circuits:", p1)
-	p2 := solvePart2(points)
+	p2 := multiplyXCoordLastTwoJB(points)
 	fmt.Println("Part 2 last connection X product:", p2)
 }

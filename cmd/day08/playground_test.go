@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSolve(t *testing.T) {
+func TestConnectJunctionBoxes(t *testing.T) {
 	input := `162,817,812
 57,618,57
 906,360,560
@@ -28,13 +28,13 @@ func TestSolve(t *testing.T) {
 
 	expected := int64(40)
 	points := parseInput(input)
-	result := solve(points, 10)
+	result := connectJunctionBoxes(points, 10)
 	if result != expected {
 		t.Errorf("Expected %d, but got %d", expected, result)
 	}
 }
 
-func TestSolvePart2(t *testing.T) {
+func TestMultiplyXCoordLastTwoJB(t *testing.T) {
 	input := `162,817,812
 57,618,57
 906,360,560
@@ -58,7 +58,7 @@ func TestSolvePart2(t *testing.T) {
 
 	expected := int64(25272)
 	points := parseInput(input)
-	result := solvePart2(points)
+	result := multiplyXCoordLastTwoJB(points)
 	if result != expected {
 		t.Errorf("Expected %d, but got %d", expected, result)
 	}

@@ -21,15 +21,13 @@ type UnionFind struct {
 }
 
 func parseInput(input string) []Point {
+	const threeDSpace = 3
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	points := make([]Point, 0, len(lines))
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
 		parts := strings.Split(line, ",")
-		if len(parts) != 3 {
+		if len(parts) != threeDSpace {
 			continue
 		}
 		x, _ := strconv.ParseInt(strings.TrimSpace(parts[0]), 10, 64)
@@ -40,17 +38,17 @@ func parseInput(input string) []Point {
 	return points
 }
 
-func distSq(p1, p2 Point) int64 {
+func squareDistance(p1, p2 Point) int64 {
 	dx := p1.x - p2.x
 	dy := p1.y - p2.y
 	dz := p1.z - p2.z
 	return dx*dx + dy*dy + dz*dz
 }
 
-func NewUnionFind(n int) *UnionFind {
-	parent := make([]int, n)
-	size := make([]int, n)
-	for i := 0; i < n; i++ {
+func NewUnionFind(elements int) *UnionFind {
+	parent := make([]int, elements)
+	size := make([]int, elements)
+	for i := 0; i < elements; i++ {
 		parent[i] = i
 		size[i] = 1
 	}
@@ -77,58 +75,42 @@ func (uf *UnionFind) Union(i, j int) {
 	}
 }
 
-func solve(points []Point, connections int) int64 {
-	n := len(points)
-	pairs := make([]Pair, 0, n*(n-1)/2)
-	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			pairs = append(pairs, Pair{i, j, distSq(points[i], points[j])})
-		}
-	}
+func connectJunctionBoxes(points []Point, connections int) int64 {
+	sizePoints, pairs := createAllPossibleUniquePairs(points)
 
-	sort.Slice(pairs, func(i, j int) bool {
-		if pairs[i].distSq != pairs[j].distSq {
-			return pairs[i].distSq < pairs[j].distSq
-		}
-		if pairs[i].p1 != pairs[j].p1 {
-			return pairs[i].p1 < pairs[j].p1
-		}
-		return pairs[i].p2 < pairs[j].p2
-	})
+	sortAsc(pairs)
 
 	if connections > len(pairs) {
 		connections = len(pairs)
 	}
 
-	uf := NewUnionFind(n)
+	uf := NewUnionFind(sizePoints)
 	for i := 0; i < connections; i++ {
 		uf.Union(pairs[i].p1, pairs[i].p2)
 	}
 
-	sizes := make([]int, 0)
-	for i := 0; i < n; i++ {
-		if uf.parent[i] == i {
-			sizes = append(sizes, uf.size[i])
-		}
-	}
-	sort.Sort(sort.Reverse(sort.IntSlice(sizes)))
+	largestCircuits := getLargestCircuits(sizePoints, uf)
 
 	var result int64 = 1
-	for i := 0; i < 3 && i < len(sizes); i++ {
-		result *= int64(sizes[i])
+	const amountLargestJB = 3
+	for i := 0; i < amountLargestJB && i < len(largestCircuits); i++ {
+		result *= int64(largestCircuits[i])
 	}
 	return result
 }
 
-func solvePart2(points []Point) int64 {
-	n := len(points)
-	pairs := make([]Pair, 0, n*(n-1)/2)
-	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			pairs = append(pairs, Pair{i, j, distSq(points[i], points[j])})
+func getLargestCircuits(sizePoints int, uf *UnionFind) []int {
+	largestCircuits := make([]int, 0)
+	for i := 0; i < sizePoints; i++ {
+		if uf.parent[i] == i {
+			largestCircuits = append(largestCircuits, uf.size[i])
 		}
 	}
+	sort.Sort(sort.Reverse(sort.IntSlice(largestCircuits)))
+	return largestCircuits
+}
 
+func sortAsc(pairs []Pair) {
 	sort.Slice(pairs, func(i, j int) bool {
 		if pairs[i].distSq != pairs[j].distSq {
 			return pairs[i].distSq < pairs[j].distSq
@@ -138,9 +120,27 @@ func solvePart2(points []Point) int64 {
 		}
 		return pairs[i].p2 < pairs[j].p2
 	})
+}
 
-	uf := NewUnionFind(n)
-	numCircuits := n
+func createAllPossibleUniquePairs(points []Point) (int, []Pair) {
+	sizePoints := len(points)
+	optimizedCap := sizePoints * (sizePoints - 1) / 2
+	pairs := make([]Pair, 0, optimizedCap)
+	for i := 0; i < sizePoints; i++ {
+		for j := i + 1; j < sizePoints; j++ {
+			pairs = append(pairs, Pair{i, j, squareDistance(points[i], points[j])})
+		}
+	}
+	return sizePoints, pairs
+}
+
+func multiplyXCoordLastTwoJB(points []Point) int64 {
+	sizePoints, pairs := createAllPossibleUniquePairs(points)
+
+	sortAsc(pairs)
+
+	uf := NewUnionFind(sizePoints)
+	numCircuits := sizePoints
 	var lastXProduct int64
 
 	for _, p := range pairs {
@@ -155,6 +155,5 @@ func solvePart2(points []Point) int64 {
 			}
 		}
 	}
-
 	return lastXProduct
 }
