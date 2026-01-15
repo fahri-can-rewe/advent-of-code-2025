@@ -4,8 +4,7 @@ import (
 	"testing"
 )
 
-func TestConnectJunctionBoxes(t *testing.T) {
-	input := `162,817,812
+const boxes = `162,817,812
 57,618,57
 906,360,560
 592,479,940
@@ -26,38 +25,42 @@ func TestConnectJunctionBoxes(t *testing.T) {
 984,92,344
 425,690,689`
 
-	expected := int64(40)
-	points := parseInput(input)
-	result := connectJunctionBoxes(points, 10)
-	if result != expected {
-		t.Errorf("Expected %d, but got %d", expected, result)
+func TestConnectJunctionBoxes(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		connections int
+		want        int64
+	}{
+		{
+			name:        "connections less than expected",
+			input:       boxes,
+			connections: 10,
+			want:        40,
+		},
+		{
+			name:        "connections more than expected",
+			input:       boxes,
+			connections: 1000,
+			want:        20,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			points := parseInput(test.input)
+			result := connectJunctionBoxes(points, test.connections)
+			if result != test.want {
+				t.Errorf("Expected %d, but got %d", test.want, result)
+			}
+		})
+
 	}
 }
 
 func TestMultiplyXCoordLastTwoJB(t *testing.T) {
-	input := `162,817,812
-57,618,57
-906,360,560
-592,479,940
-352,342,300
-466,668,158
-542,29,236
-431,825,988
-739,650,466
-52,470,668
-216,146,977
-819,987,18
-117,168,530
-805,96,715
-346,949,466
-970,615,88
-941,993,340
-862,61,35
-984,92,344
-425,690,689`
-
 	expected := int64(25272)
-	points := parseInput(input)
+	points := parseInput(boxes)
 	result := multiplyXCoordLastTwoJB(points)
 	if result != expected {
 		t.Errorf("Expected %d, but got %d", expected, result)

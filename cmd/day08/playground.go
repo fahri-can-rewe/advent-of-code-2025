@@ -21,15 +21,11 @@ type UnionFind struct {
 }
 
 func parseInput(input string) []Point {
-	const threeDSpace = 3
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	points := make([]Point, 0, len(lines))
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		parts := strings.Split(line, ",")
-		if len(parts) != threeDSpace {
-			continue
-		}
 		x, _ := strconv.ParseInt(strings.TrimSpace(parts[0]), 10, 64)
 		y, _ := strconv.ParseInt(strings.TrimSpace(parts[1]), 10, 64)
 		z, _ := strconv.ParseInt(strings.TrimSpace(parts[2]), 10, 64)
