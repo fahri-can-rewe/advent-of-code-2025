@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestParseInput(t *testing.T) {
 	tests := []struct {
@@ -24,13 +27,21 @@ func TestParseInput(t *testing.T) {
 			`,
 			want: [][]int{{7, 8}},
 		},
+		{
+			name: "Negative Coordinates",
+			input: `
+			-1,-2
+			0,0
+			`,
+			want: [][]int{{-1, -2}, {0, 0}},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := parseInput(tt.input)
-			if len(result) != len(tt.want) {
-				t.Fatalf("want length %d, got %d", len(tt.want), len(result))
+			if !reflect.DeepEqual(result, tt.want) {
+				t.Errorf("parseInput() = %v, want %v", result, tt.want)
 			}
 		})
 	}
@@ -51,6 +62,38 @@ func TestFindLargestRectangle(t *testing.T) {
 			`,
 			want: 25,
 		},
+		{
+			name: "Same Points",
+			input: `
+			1,1
+			1,1
+			`,
+			want: 1,
+		},
+		{
+			name: "Horizontal Line",
+			input: `
+			1,1
+			5,1
+			`,
+			want: 5,
+		},
+		{
+			name: "Vertical Line",
+			input: `
+			1,1
+			1,5
+			`,
+			want: 5,
+		},
+		{
+			name: "Negative Range",
+			input: `
+			-2,-2
+			2,2
+			`,
+			want: 25,
+		},
 	}
 
 	for _, tt := range tests {
@@ -58,7 +101,7 @@ func TestFindLargestRectangle(t *testing.T) {
 			coordinates := parseInput(tt.input)
 			result := findLargestRectangle(coordinates)
 			if result != tt.want {
-				t.Errorf("want %d, got %d", tt.want, result)
+				t.Errorf("findLargestRectangle() = %d, want %d", result, tt.want)
 			}
 		})
 	}
