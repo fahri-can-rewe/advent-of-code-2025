@@ -15,4 +15,6 @@ func main() {
 	coordinates := parseInput(input)
 	area := findLargestRectangle(coordinates)
 	fmt.Println("Part 1 largest area of any rectangle:", area)
+	area2 := useOnlyRedAndGreenTiles(coordinates)
+	fmt.Println("Part 2 largest area of any rectangle using only red and green tiles:", area2)
 }

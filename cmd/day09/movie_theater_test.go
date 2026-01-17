@@ -106,3 +106,20 @@ func TestFindLargestRectangle(t *testing.T) {
 		})
 	}
 }
+
+func TestFindLargestRectanglePart2(t *testing.T) {
+	input := `7,1
+11,1
+11,7
+9,7
+9,5
+2,5
+2,3
+7,3`
+	coordinates := parseInput(input)
+	want := int64(24)
+	result := useOnlyRedAndGreenTiles(coordinates)
+	if result != want {
+		t.Errorf("useOnlyRedAndGreenTiles() = %d, want %d", result, want)
+	}
+}
