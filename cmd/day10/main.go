@@ -12,6 +12,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	btnPresses := countBtnPress(input)
-	fmt.Println("Part 1 fewest indicator lights on all of the machines:", btnPresses)
+	btnPresses1 := countBtnPress(input)
+	fmt.Println("Part 1 fewest indicator lights on all of the machines:", btnPresses1)
+
+	btnPresses2 := countJoltagePresses(input)
+	fmt.Println("Part 2 fewest button presses for joltage requirements:", btnPresses2)
 }

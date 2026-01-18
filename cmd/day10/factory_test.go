@@ -25,6 +25,7 @@ func TestParseInput(t *testing.T) {
 						{0, 2},
 						{0, 1},
 					},
+					JoltageTargets: []int{3, 5, 4, 7},
 				},
 			},
 		},
@@ -33,12 +34,14 @@ func TestParseInput(t *testing.T) {
 			input: "[.#] (0) (1)\n[#.] (1)",
 			want: []Machine{
 				{
-					Target:  []bool{false, true},
-					Buttons: [][]int{{0}, {1}},
+					Target:         []bool{false, true},
+					Buttons:        [][]int{{0}, {1}},
+					JoltageTargets: nil,
 				},
 				{
-					Target:  []bool{true, false},
-					Buttons: [][]int{{1}},
+					Target:         []bool{true, false},
+					Buttons:        [][]int{{1}},
+					JoltageTargets: nil,
 				},
 			},
 		},
@@ -52,8 +55,9 @@ func TestParseInput(t *testing.T) {
 			input: "[#] {10}",
 			want: []Machine{
 				{
-					Target:  []bool{true},
-					Buttons: [][]int{},
+					Target:         []bool{true},
+					Buttons:        [][]int{},
+					JoltageTargets: []int{10},
 				},
 			},
 		},
@@ -62,8 +66,9 @@ func TestParseInput(t *testing.T) {
 			input: "\n\n  [.##.] (0,1)  \n\n  ",
 			want: []Machine{
 				{
-					Target:  []bool{false, true, true, false},
-					Buttons: [][]int{{0, 1}},
+					Target:         []bool{false, true, true, false},
+					Buttons:        [][]int{{0, 1}},
+					JoltageTargets: nil,
 				},
 			},
 		},
@@ -74,6 +79,31 @@ func TestParseInput(t *testing.T) {
 			result := parseInput(tt.input)
 			if !reflect.DeepEqual(result, tt.want) {
 				t.Errorf("parseInput() = %+v, want %+v", result, tt.want)
+			}
+		})
+	}
+}
+
+func TestCountJoltagePresses(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int
+	}{
+		{
+			name: "full sample input",
+			input: "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}\n" +
+				"[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}\n" +
+				"[.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}",
+			want: 33,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := countJoltagePresses(tt.input)
+			if result != tt.want {
+				t.Errorf("countJoltagePresses() = %d, want %d", result, tt.want)
 			}
 		})
 	}
