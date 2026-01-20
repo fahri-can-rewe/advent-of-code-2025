@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	input, err := util.ReadInput("cmd/day11/input_sample.txt")
+	input, err := util.ReadInput("cmd/day11/input1.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	racks := parseInput(input)
-	steps := dfs(racks)
+	steps := useDFS(racks)
 	fmt.Println("Part 1 amount different paths to out:", steps)
 }
