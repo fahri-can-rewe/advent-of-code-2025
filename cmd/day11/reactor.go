@@ -58,38 +58,61 @@ func countPaths(racks map[string][]string, current string, memo map[string]int) 
 func useDFS(racks map[string][]string, isPartTwo bool) int {
 	memo := make(map[string]int)
 	if isPartTwo {
-		return countPathsWithTargets(racks, "svr", false, false, make(map[State]int))
+		initialState := State{current: "svr", hasDac: false, hasFft: false}
+		return countPathsWithTargets(racks, initialState, make(map[State]int))
 	}
 	return countPaths(racks, start, memo)
 }
 
-func countPathsWithTargets(racks map[string][]string, current string, hasDac, hasFft bool, memo map[State]int) int {
-	// Update state if we just arrived at a target
-	if current == "dac" {
-		hasDac = true
+func countPathsWithTargets(racks map[string][]string, state State, memo map[State]int) int {
+	// 1. Update the state if the current node is a target
+	if state.current == "dac" {
+		state.hasDac = true
 	}
-	if current == "fft" {
-		hasFft = true
+	if state.current == "fft" {
+		state.hasFft = true
 	}
 
-	// Base Case
-	if current == "out" {
-		if hasDac && hasFft {
+	// 2. Base Case: Reached the end
+	if state.current == "out" {
+		if state.hasDac && state.hasFft {
 			return 1
 		}
 		return 0
 	}
 
-	state := State{current, hasDac, hasFft}
+	// 3. Memoization check
 	if val, ok := memo[state]; ok {
 		return val
 	}
 
-	total := 0
-	for _, neighbor := range racks[current] {
-		total += countPathsWithTargets(racks, neighbor, hasDac, hasFft, memo)
+	total, isDone := exploreRecursive(racks, state, memo)
+	if isDone {
+		return 0
 	}
 
+	// 5. Store and return
 	memo[state] = total
 	return total
+}
+
+func exploreRecursive(racks map[string][]string, state State, memo map[State]int) (int, bool) {
+	// 4. Recursive exploration
+	total := 0
+	outputs, exists := racks[state.current]
+	if !exists {
+		memo[state] = 0
+		return 0, true
+	}
+
+	for _, neighbor := range outputs {
+		// Create a new state for the neighbor while preserving the current hasDac/hasFft flags
+		nextState := State{
+			current: neighbor,
+			hasDac:  state.hasDac,
+			hasFft:  state.hasFft,
+		}
+		total += countPathsWithTargets(racks, nextState, memo)
+	}
+	return total, false
 }
