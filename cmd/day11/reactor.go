@@ -17,9 +17,6 @@ func parseInput(input string) map[string][]string {
 
 		// 2. Split into "Key" and "Remainder"
 		parts := strings.SplitN(line, ":", 2)
-		if len(parts) < 2 {
-			continue // Guard against lines without a colon
-		}
 
 		key := strings.TrimSpace(parts[0])
 		outputs := strings.Fields(parts[1])
